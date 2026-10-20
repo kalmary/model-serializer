@@ -5,6 +5,7 @@ from dataclasses import dataclass, fields, is_dataclass
 from numbers import Real
 
 
+# Subclass dataclass fields define both the accepted metric schema and saved names.
 @dataclass
 class Metrics(ABC):
     def __post_init__(self) -> None:
@@ -45,6 +46,7 @@ def validate_metrics[MetricsType: Metrics](
     observed_history = observed_metric(metrics)
     if not isinstance(observed_history, list):
         raise TypeError("observed metric must return a list")
+    # Selecting the original field preserves an unambiguous name for ranking.
     if not any(observed_history is history for _, history in metric_values):
         raise ValueError("observed metric must return a metrics field")
     if len(observed_history) != history_length:

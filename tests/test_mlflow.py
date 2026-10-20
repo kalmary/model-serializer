@@ -4,13 +4,13 @@ from pathlib import Path
 import torch
 from mlflow.entities import ViewType
 from mlflow.tracking import MlflowClient
-from torch import nn
-
-from model_serializer import Metrics
 from model_serializer.tracking import (
     MLflowModelSerializer,
     load_mlflow_model,
 )
+from torch import nn
+
+from model_serializer import Metrics
 
 
 @dataclass

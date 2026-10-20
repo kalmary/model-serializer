@@ -12,6 +12,9 @@ dependencies = [
     "torch>=2.4",
 ]
 
+[project.scripts]
+model-serializer-ui = "model_serializer.tracking.ui:main"
+
 [project.optional-dependencies]
 mlflow = [
     "mlflow>=3.17",
