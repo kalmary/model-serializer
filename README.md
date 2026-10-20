@@ -14,19 +14,15 @@
 Install the local package and its test dependencies:
 
 ```bash
-uv sync --extra mlflow --group test
+uv sync --group test
 ```
 
-The `mlflow` extra is only required for MLflow tracking.
+MLflow support is included in the base installation.
 
 Add the package from a local checkout to another uv project:
 
 ```bash
-# Local serializer only
 uv add --editable /path/to/model_serializer
-
-# Local and MLflow serializers
-uv add --editable --extra mlflow /path/to/model_serializer
 ```
 
 ## Metrics and model factory

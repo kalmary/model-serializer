@@ -1,24 +1,20 @@
 [project]
 name = "model-serializer"
 version = "0.1.0"
-description = "Ranked PyTorch checkpoint serialization with optional MLflow tracking"
+description = "Ranked PyTorch checkpoint serialization with MLflow tracking"
 readme = "README.md"
 authors = [
     { name = "Michal Siniarski", email = "siniarskim@gmail.com" }
 ]
 requires-python = ">=3.12"
 dependencies = [
+    "mlflow>=3.17",
     "pyyaml>=6.0",
     "torch>=2.4",
 ]
 
 [project.scripts]
 model-serializer-ui = "model_serializer.tracking.ui:main"
-
-[project.optional-dependencies]
-mlflow = [
-    "mlflow>=3.17",
-]
 
 [build-system]
 requires = ["uv_build>=0.11.19,<0.12.0"]
