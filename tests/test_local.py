@@ -80,9 +80,7 @@ def test_checkpoint_rebuilds_model_with_factory(tmp_path):
         model_name="unet",
         configs=configs,
     )
-    saved_path = serializer.checkpoint(
-        model, TrainingMetrics([0.5], [0.5])
-    )
+    saved_path = serializer.checkpoint(model, TrainingMetrics([0.5], [0.5]))
 
     loaded = module.load_checkpoint_model(
         saved_path, lambda saved: nn.Linear(**saved["model"])
@@ -93,6 +91,28 @@ def test_checkpoint_rebuilds_model_with_factory(tmp_path):
         model.state_dict().values(), loaded.state_dict().values(), strict=True
     ):
         torch.testing.assert_close(actual, expected)
+
+
+def test_checkpoint_can_store_per_model_configs(tmp_path):
+    module = _serializer_module()
+    TrainingMetrics = _metrics_type(module)
+    serializer = module.ModelSerializer[TrainingMetrics](
+        mode="max",
+        observed_metric=lambda metrics: metrics.miou,
+        n_models=1,
+        path=tmp_path / "checkpoints",
+        model_name="optimized",
+        configs={"model": {"name": "default"}},
+    )
+
+    saved = serializer.checkpoint(
+        _model(1.0),
+        TrainingMetrics([0.5], [0.5]),
+        {"model": {"name": "sampled"}},
+    )
+
+    with (saved / "configs.yaml").open(encoding="utf-8") as file:
+        assert yaml.safe_load(file) == {"model": {"name": "sampled"}}
 
 
 def test_rejected_model_still_advances_unique_id(tmp_path):

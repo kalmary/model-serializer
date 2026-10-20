@@ -109,6 +109,10 @@ loaded_model = load_checkpoint_model(
 
 `mode="max"` keeps the largest observed values; use `mode="min"` for metrics such as loss. `checkpoint()` returns the saved directory when the model enters the top N and `None` when it does not. Ranked directories can be renamed as better models arrive, so resolve the final best path after training as shown above.
 
+Pass `configs=` to `checkpoint()` when candidates use different resolved
+configurations, such as Optuna trials. That mapping is stored with that model;
+otherwise the constructor configuration is used.
+
 ## MLflow tracking
 
 The MLflow serializer applies the same top-N selection while logging accepted checkpoints as MLflow runs. Use explicit paths so the database and artifacts do not depend on the process working directory:
@@ -164,10 +168,14 @@ loaded_model = load_mlflow_model(
 Inspect the experiment in the MLflow UI:
 
 ```bash
-uv run model-serializer-ui \
+uv run python -m model_serializer.tracking.ui \
   --backend-store-uri sqlite:///data/mlflow/mlflow.db
 ```
 
-Then open `http://127.0.0.1:5000`. `model-serializer-ui` is a thin entrypoint for MLflow's existing UI, so it accepts the same options, including `--host` and `--port`. The UI shows the serializer's runs, parameters, metric histories, ranks, and checkpoint artifacts. These checkpoints are MLflow runs; the serializer does not add them to the separate MLflow Model Registry.
+Then open `http://127.0.0.1:5000`. The UI module is a thin entrypoint for
+MLflow's existing UI, so it accepts the same options, including `--host` and
+`--port`. The UI shows the serializer's runs, parameters, metric histories,
+ranks, and checkpoint artifacts. These checkpoints are MLflow runs; the
+serializer does not add them to the separate MLflow Model Registry.
 
 The package stores inference checkpoints. Resumable training additionally requires optimizer, scheduler, epoch, gradient-scaler, and random-generator state.

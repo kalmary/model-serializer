@@ -9,7 +9,7 @@ def test_ui_entrypoint_forwards_arguments(monkeypatch) -> None:
         sys,
         "argv",
         [
-            "model-serializer-ui",
+            "model_serializer.tracking.ui",
             "--backend-store-uri",
             "sqlite:///models.db",
             "--port",

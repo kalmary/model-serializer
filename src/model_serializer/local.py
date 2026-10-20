@@ -33,9 +33,7 @@ class ModelSerializer[MetricsType: Metrics]:
         model_name: str,
         configs: dict[str, Any],
     ) -> None:
-        validate_serializer(
-            mode, observed_metric, n_models, model_name, configs
-        )
+        validate_serializer(mode, observed_metric, n_models, model_name, configs)
         self.mode = mode
         self.observed_metric = observed_metric
         self.n_models = n_models
@@ -55,20 +53,26 @@ class ModelSerializer[MetricsType: Metrics]:
             shutil.rmtree(self.path)
         self.path.mkdir(parents=True)
 
-    def checkpoint(self, model: Any, metrics: MetricsType) -> Path | None:
+    def checkpoint(
+        self,
+        model: Any,
+        metrics: MetricsType,
+        configs: dict[str, Any] | None = None,
+    ) -> Path | None:
         metric_values, score = validate_metrics(metrics, self.observed_metric)
         validate_model(model)
+        if configs is not None and not isinstance(configs, dict):
+            raise TypeError("configs must be a dictionary")
+        checkpoint_configs = self.configs if configs is None else deepcopy(configs)
         self._checked_models += 1
         unique_id = self._checked_models
         if not qualifies(self._checkpoints, score, self.mode, self.n_models):
             return None
 
-        temporary_path = Path(
-            tempfile.mkdtemp(prefix=".checkpoint_", dir=self.path)
-        )
+        temporary_path = Path(tempfile.mkdtemp(prefix=".checkpoint_", dir=self.path))
         try:
             write_checkpoint_artifacts(
-                temporary_path, model, metric_values, self.configs
+                temporary_path, model, metric_values, checkpoint_configs
             )
         except BaseException:
             shutil.rmtree(temporary_path, ignore_errors=True)
@@ -84,13 +88,9 @@ class ModelSerializer[MetricsType: Metrics]:
         if removed is not None:
             shutil.rmtree(removed.path)
 
-        assign_ranked_paths(
-            ranked, self.path, self.model_name, self._rank_width
-        )
+        assign_ranked_paths(ranked, self.path, self.model_name, self._rank_width)
         self._checkpoints = ranked
-        return next(
-            item.path for item in ranked if item.unique_id == unique_id
-        )
+        return next(item.path for item in ranked if item.unique_id == unique_id)
 
 
 __all__ = ["Metrics", "ModelSerializer", "load_checkpoint_model"]
