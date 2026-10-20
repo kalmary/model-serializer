@@ -18,6 +18,7 @@ uv sync --group test
 ```
 
 MLflow support is included in the base installation.
+On Linux, UV uses PyTorch's CPU wheel index for this checkout.
 
 Add the package from a local checkout to another uv project:
 
